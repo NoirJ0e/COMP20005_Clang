@@ -40,19 +40,71 @@
 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /*******************************************************************/
 
 #define MAX_LINE 99999
 
-int
-main(int argc, char *argv[]) {
-  // read data from file with "<" operator
-
-	return 0;
+int main(int argc, char *argv[]) {
+  // Stage 1
+  // initialize variables
+  int year, month, day, hour, minute, count = 0, max_solar;
+  double solar, wind, temp, max_wind, max_temp;
+  // initialize variables for the first row of data
+  int year_t, month_t, day_t, hour_t, minute_t, count_t;
+  double solar_t, wind_t, temp_t;
+  // bypass the first line of data as it is the title;
+  // HACK: use scanf("%*[^\n]%*c") to bypass the first line of data, it will
+  // skip all characters until it meets a newline character, then it will skip
+  // the newline character;
+  scanf("%*[^\n]%*c");
+  // read data from file with "<" operator with while loop, break with read EOF;
+  while (scanf("%d%d%d%d%d%lf%lf%lf", &year, &month, &day, &hour, &minute,
+               &solar, &wind, &temp) != EOF) {
+    // store the first row of data
+    if (count == 0) {
+      count_t = count;
+      year_t = year;
+      month_t = month;
+      day_t = day;
+      hour_t = hour;
+      minute_t = minute;
+      solar_t = solar;
+      wind_t = wind;
+      temp_t = temp;
+      max_solar = solar;
+      max_wind = wind;
+      max_temp = temp;
+    }
+    // count total lines of data, with getchar() and check if ending with \n;
+    if (getchar() == '\n') {
+      count++;
+    }
+    if (solar > max_solar) {
+      max_solar = solar;
+    }
+    if (wind > max_wind) {
+      max_wind = wind;
+    }
+    if (temp > max_temp) {
+      max_temp = temp;
+    }
+    //
+  }
+  // print out the result of stage 1
+  printf("S1, %d data rows in total\n", count);
+  printf("S1, row %5d: at %2d:%2d on %02d/%02d/%4d, solar = %3.0lf, wind = "
+         "%2.2lf, temp = %4.1lf\n",
+         count_t, hour_t, minute_t, day_t, month_t, year_t, solar_t, wind_t, temp_t);
+  printf("S1, row %5d: at %2d:%2d on %02d/%02d/%4d, solar = %3.0lf, wind = "
+         "%2.2lf, temp = %2.1lf\n",
+         count-1, hour, minute, day, month, year, solar, wind, temp);
+  printf("S1, max solar = %4d\n", max_solar);
+  printf("S1, max wind  = %4.1lf\n", max_wind);
+  printf("S1, max temp  = %2.1lf\n", max_temp);
+  return 0;
 }
-

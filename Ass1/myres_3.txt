@@ -1,0 +1,6 @@
+S1, 73423 data rows in total
+S1, row     0: at  8:44 on 02/06/2020, solar =  53, wind = 0.83, temp =  9.9
+S1, row 73422: at  9:56 on 20/03/2023, solar = 351, wind = 1.19, temp = 16.1
+S1, max solar = 1088
+S1, max wind  =  6.0
+S1, max temp  = 40.3

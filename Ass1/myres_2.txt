@@ -1,0 +1,6 @@
+S1, 500 data rows in total
+S1, row     0: at 15:44 on 05/08/2021, solar = 129, wind = 3.20, temp = 14.6
+S1, row   499: at 20:43 on 10/08/2021, solar =   0, wind = 2.70, temp = 15.6
+S1, max solar =  633
+S1, max wind  =  4.5
+S1, max temp  = 17.1
