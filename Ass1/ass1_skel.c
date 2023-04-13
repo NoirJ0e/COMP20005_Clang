@@ -35,8 +35,8 @@
    or not I personally make use of such solutions or sought benefit from such
    actions.
 
-   Signed by: [Enter your full name and student number here before submission]
-   Dated:     [Enter the date that you "signed" the declaration]
+   Signed by: [Zilin Xu 1262248]
+   Dated:     [2023/04/12]
 
 */
 
@@ -47,9 +47,11 @@
 
 /*******************************************************************/
 
+#define MAX_LINE 99999
 
 int
 main(int argc, char *argv[]) {
+  // read data from file with "<" operator
 
 	return 0;
 }
