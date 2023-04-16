@@ -49,7 +49,7 @@
 
 #define MAX_LINE 99999
 
-int main(int argc, char *argv[]) {
+void stage_1(void) {
   // Stage 1
   // initialize variables
   int year, month, day, hour, minute, count = 0, max_solar;
@@ -99,12 +99,24 @@ int main(int argc, char *argv[]) {
   printf("S1, %d data rows in total\n", count);
   printf("S1, row %5d: at %2d:%2d on %02d/%02d/%4d, solar = %3.0lf, wind = "
          "%2.2lf, temp = %4.1lf\n",
-         count_t, hour_t, minute_t, day_t, month_t, year_t, solar_t, wind_t, temp_t);
+         count_t, hour_t, minute_t, day_t, month_t, year_t, solar_t, wind_t,
+         temp_t);
   printf("S1, row %5d: at %2d:%2d on %02d/%02d/%4d, solar = %3.0lf, wind = "
          "%2.2lf, temp = %2.1lf\n",
-         count-1, hour, minute, day, month, year, solar, wind, temp);
+         count - 1, hour, minute, day, month, year, solar, wind, temp);
   printf("S1, max solar = %4d\n", max_solar);
   printf("S1, max wind  = %4.1lf\n", max_wind);
   printf("S1, max temp  = %2.1lf\n", max_temp);
-  return 0;
+}
+
+void stage_2(void) {
+  printf("S2,              Average Solar Energy by Month and Time of Day");
+  printf("S2,        Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  Dec");
+  printf("S2,       +----+----+----+----+----+----+----+----+----+----+----+----+");
+
+}
+
+int main(int argc, char *argv[]) { 
+  stage_1();
+  return 0; 
 }
