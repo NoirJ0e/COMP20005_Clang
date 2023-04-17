@@ -4,3 +4,7 @@ S1, row    49: at 14:43 on 03/06/2020, solar = 198, wind = 2.00, temp = 13.0
 S1, max solar =  433
 S1, max wind  =  2.9
 S1, max temp  = 14.5
+
+S2,              Average Solar Energy by Month and Time of Day
+S2,        Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  Dec
+S2,       +----+----+----+----+----+----+----+----+----+----+----+----+

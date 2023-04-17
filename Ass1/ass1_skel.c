@@ -49,9 +49,11 @@
 
 #define MAX_LINE 99999
 
-void stage_1(void) {
-  // Stage 1
-  // initialize variables
+int main(int argc, char *argv[]) { 
+
+  // NOTE: read data input should be done in main function, othervise i need to read them again and
+  // again for each stage
+
   int year, month, day, hour, minute, count = 0, max_solar;
   double solar, wind, temp, max_wind, max_temp;
   // initialize variables for the first row of data
@@ -65,7 +67,7 @@ void stage_1(void) {
   // read data from file with "<" operator with while loop, break with read EOF;
   while (scanf("%d%d%d%d%d%lf%lf%lf", &year, &month, &day, &hour, &minute,
                &solar, &wind, &temp) != EOF) {
-    // store the first row of data
+    // store the first row of data as temp data;
     if (count == 0) {
       count_t = count;
       year_t = year;
@@ -107,16 +109,6 @@ void stage_1(void) {
   printf("S1, max solar = %4d\n", max_solar);
   printf("S1, max wind  = %4.1lf\n", max_wind);
   printf("S1, max temp  = %2.1lf\n", max_temp);
-}
 
-void stage_2(void) {
-  printf("S2,              Average Solar Energy by Month and Time of Day");
-  printf("S2,        Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  Dec");
-  printf("S2,       +----+----+----+----+----+----+----+----+----+----+----+----+");
-
-}
-
-int main(int argc, char *argv[]) { 
-  stage_1();
   return 0; 
 }
