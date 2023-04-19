@@ -59,7 +59,14 @@ typedef struct {
   double solar, wind, temp;
 } max_data_t;
 
+typedef struct {
+  int month, count;
+  double sum;
+} solar_hourly_t;
+
 weather_data_t *read_input(int *line_count) {
+  // TODO: Sort this array by hour, this should boost efficiency for following
+  // stage
   weather_data_t *total = malloc(sizeof(weather_data_t) * MAX_LINE);
   *line_count = 0;
   int position = 0;
@@ -105,8 +112,7 @@ max_data_t *find_max(weather_data_t *data, int line_count) {
   return max;
 }
 
-void print_stage1_result(weather_data_t *data, int line_count,
-                         max_data_t *max) {
+void stage_1_result(weather_data_t *data, int line_count, max_data_t *max) {
   printf("S1, %d data rows in total\n", line_count);
   printf("S1, row %6d: at %02d:%02d on %02d/%02d/%4d, solar = %4.0lf, wind = "
          "%5.2lf, temp = %4.1lf\n",
@@ -127,13 +133,58 @@ void print_stage1_result(weather_data_t *data, int line_count,
          max->solar, max->wind, max->temp);
 }
 
+int avg_hourly_solar(weather_data_t *data, int line_count, int month,
+                     int hour) {
+  solar_hourly_t result;
+  result.month = month;
+  result.count = 0;
+  result.sum = 0;
+  for (int i = 0; i < line_count; i++) {
+    if (data[i].month == month && data[i].hour == hour) {
+      result.count++;
+      result.sum += data[i].solar;
+    }
+  }
+  // with <math.h>
+  if (round(result.sum / result.count) >= 0.5) {
+    return round(result.sum / result.count);
+  } else {
+    return 0;
+  }
+}
+
+// TODO: GET CORRECT RESULT
+void stage_2_table_content(weather_data_t *data, int line_count, int month,
+                           int hour) {
+  for (int hr = 1; hr <= hour; hr++) {
+    printf("S2, %02d-%02d |", hr-1, hr);
+    for (int m = 1; m <= month; m++) {
+      if (m == 12) {
+        printf(" %3d ", avg_hourly_solar(data, line_count, m, hr));
+      } else {
+        printf(" %3d \n", avg_hourly_solar(data, line_count, m, hr));
+      }
+    }
+  }
+}
+
+void stage_2_result(weather_data_t *data, int line_count) {
+  printf("S2,              Average Solar Energy by Month and Time of Day\n");
+  printf("S2,        Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  "
+         "Dec\n");
+  printf("S2,       "
+         "+----+----+----+----+----+----+----+----+----+----+----+----+\n");
+  stage_2_table_content(data, line_count, 12, 24);
+}
+
 int main() {
   int line_count = 0;
   // all input data will be stored in this array
   weather_data_t *data = read_input(&line_count);
   max_data_t *max = find_max(data, line_count);
   // print stage 1 result
-  print_stage1_result(data, line_count, max);
+  stage_1_result(data, line_count, max);
+  stage_2_result(data, line_count);
   free(data); // free the memory allocated for the data array
 
   return 0;
