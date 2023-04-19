@@ -153,39 +153,47 @@ int avg_hourly_solar(weather_data_t *data, int line_count, int month,
   }
 }
 
-// TODO: GET CORRECT RESULT
-void stage_2_table_content(weather_data_t *data, int line_count, int month,
-                           int hour) {
+void stage_2_table_content(weather_data_t *data, int line_count, int month,int hour) {
   for (int hr = 1; hr <= hour; hr++) {
-    printf("S2, %02d-%02d |", hr-1, hr);
+    printf("S2, %02d-%02d |", hr - 1, hr);
     for (int m = 1; m <= month; m++) {
-      if (m == 12) {
-        printf(" %3d ", avg_hourly_solar(data, line_count, m, hr));
+      // TODO: Check res first then month
+      if (avg_hourly_solar(data, line_count, m, hr) >= 0.5) {
+        if (m == 12) {
+          printf(" %3d \n", avg_hourly_solar(data, line_count, m, hr));
+        } else {
+          printf(" %3d ", avg_hourly_solar(data, line_count, m, hr));
+        }
       } else {
-        printf(" %3d \n", avg_hourly_solar(data, line_count, m, hr));
+        if (m == 12) {
+          printf("  .. \n");
+        } else {
+          printf("  .. ");
+        }
       }
     }
   }
 }
 
-void stage_2_result(weather_data_t *data, int line_count) {
-  printf("S2,              Average Solar Energy by Month and Time of Day\n");
-  printf("S2,        Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  "
-         "Dec\n");
-  printf("S2,       "
-         "+----+----+----+----+----+----+----+----+----+----+----+----+\n");
-  stage_2_table_content(data, line_count, 12, 24);
-}
+  void stage_2_result(weather_data_t * data, int line_count) {
+    printf("S2,              Average Solar Energy by Month and Time of Day\n");
+    printf("S2,        Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  "
+           "Dec\n");
+    printf("S2,       "
+           "+----+----+----+----+----+----+----+----+----+----+----+----+\n");
+    stage_2_table_content(data, line_count, 12, 24);
+  }
 
-int main() {
-  int line_count = 0;
-  // all input data will be stored in this array
-  weather_data_t *data = read_input(&line_count);
-  max_data_t *max = find_max(data, line_count);
-  // print stage 1 result
-  stage_1_result(data, line_count, max);
-  stage_2_result(data, line_count);
-  free(data); // free the memory allocated for the data array
+  int main() {
+    int line_count = 0;
+    // all input data will be stored in this array
+    weather_data_t *data = read_input(&line_count);
+    max_data_t *max = find_max(data, line_count);
+    // print stage 1 result
+    stage_1_result(data, line_count, max);
+    printf("\n");
+    stage_2_result(data, line_count);
+    free(data); // free the memory allocated for the data array
 
-  return 0;
-}
+    return 0;
+  }
