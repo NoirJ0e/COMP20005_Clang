@@ -43,7 +43,7 @@ S3, Apr |                                                      |
 S3, May |                                                      |
 S3, Jun |                                                      |
 S3, Jul |                                                      |
-S3, Aug |          ************                               |
+S3, Aug |          ************                                |
 S3, Sep |                                                      |
 S3, Oct |                                                      |
 S3, Nov |                                                      |

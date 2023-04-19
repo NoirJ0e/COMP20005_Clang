@@ -196,8 +196,8 @@ typedef struct {
 month_cap_t *find_month_cap(weather_data_t *data, int line_count, int month) {
   month_cap_t *result = malloc(sizeof(month_cap_t));
   result->max = 0.0;
-  result->min = 30.0; // assume the lowest temperature is 30, if set to 0 it's so
-                    // hard to change
+  result->min = 30.0; // assume the lowest temperature is 30, if set to 0 it's
+                      // so hard to change
   for (int i = 0; i < line_count; i++) {
     if (data[i].month == month) {
       if (data[i].temp > result->max) {
@@ -241,15 +241,13 @@ void stage_3_table(weather_data_t *data, int line_count, int month) {
   // FIX: month with no data has incorrect postion for "|"
   for (int i = -5; i < 50; i++) {
     if (i == 49) {
-      printf(" |");
+      printf("|");
       break;
-    }
-    // if (i < round(result->min)-1 || ((i > round(result->max)) && i != 47)) {
-    if (i < round(result->min)-1 || (i > round(result->max) && i < 49)) {
+    } else if (i < round(result->min) - 1 || i >= round(result->max)) {
       printf(" ");
-    } else if (round(result->min) <= i && i <= round(result->max)) {
+    } else {
       printf("*");
-    }  
+    }
   }
 }
 
@@ -263,7 +261,8 @@ void stage_3_result(weather_data_t *data, int line_count) {
     printf("\n");
   }
   printf("S3,     +----+----+----+----+----+----+----+----+----+----+----+\n");
-  printf("S3,    -5    0    5   10   15   20   25   30   35   40   45   50\n\n");
+  printf(
+      "S3,    -5    0    5   10   15   20   25   30   35   40   45   50\n\n");
   printf("ta daa!\n");
 }
 
