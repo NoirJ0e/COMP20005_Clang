@@ -36,18 +36,18 @@ S2, 23-24 |  ..   ..   ..   ..   ..   ..   ..   ..   ..   ..   ..   ..
 S3,                  Min/Max Temperature by Month
 S3,    -5    0    5   10   15   20   25   30   35   40   45   50
 S3,     +----+----+----+----+----+----+----+----+----+----+----+
-S3, Jan |                                                      
-S3, Feb |                                                      
-S3, Mar |                                                      
-S3, Apr |                                                      
-S3, May |                                                      
-S3, Jun |              ******                                 
-S3, Jul |                                                      
-S3, Aug |                                                      
-S3, Sep |                                                      
-S3, Oct |                                                      
-S3, Nov |                                                      
-S3, Dec |                                                      
+S3, Jan |min: 30.0, max: 0.0                                                      |
+S3, Feb |min: 30.0, max: 0.0                                                      |
+S3, Mar |min: 30.0, max: 0.0                                                      |
+S3, Apr |min: 30.0, max: 0.0                                                      |
+S3, May |min: 30.0, max: 0.0                                                      |
+S3, Jun |min: 9.9, max: 14.5               ******                                 |
+S3, Jul |min: 30.0, max: 0.0                                                      |
+S3, Aug |min: 30.0, max: 0.0                                                      |
+S3, Sep |min: 30.0, max: 0.0                                                      |
+S3, Oct |min: 30.0, max: 0.0                                                      |
+S3, Nov |min: 30.0, max: 0.0                                                      |
+S3, Dec |min: 30.0, max: 0.0                                                      |
 S3,     +----+----+----+----+----+----+----+----+----+----+----+
 S3,    -5    0    5   10   15   20   25   30   35   40   45   50
 
