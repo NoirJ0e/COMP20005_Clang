@@ -49,7 +49,7 @@
 
 #define MAX_LINE 99999
 
-// TODO: Try pass arguments by reference
+// TODO: Add comment
 
 typedef struct {
   int year, month, day, hour, minute;
@@ -193,18 +193,18 @@ typedef struct {
   double min;
 } month_cap_t;
 
-month_cap_t *find_month_cap(weather_data_t *data, int line_count, int month) {
-  month_cap_t *result = malloc(sizeof(month_cap_t));
-  result->max = 0.0;
-  result->min = 30.0; // assume the lowest temperature is 30, if set to 0 it's
+month_cap_t find_month_cap(weather_data_t *data, int line_count, int month) {
+  month_cap_t result;
+  result.max = 0.0;
+  result.min = 30.0; // assume the lowest temperature is 30, if set to 0 it's
                       // so hard to change
   for (int i = 0; i < line_count; i++) {
     if (data[i].month == month) {
-      if (data[i].temp > result->max) {
-        result->max = data[i].temp;
+      if (data[i].temp > result.max) {
+        result.max = data[i].temp;
       }
-      if (data[i].temp < result->min) {
-        result->min = data[i].temp;
+      if (data[i].temp < result.min) {
+        result.min = data[i].temp;
       }
     }
   }
@@ -212,7 +212,7 @@ month_cap_t *find_month_cap(weather_data_t *data, int line_count, int month) {
 }
 
 void stage_3_table(weather_data_t *data, int line_count, int month) {
-  month_cap_t *result = find_month_cap(data, line_count, month);
+  month_cap_t result = find_month_cap(data, line_count, month);
   if (month == 1) {
     printf("S3, Jan |");
   } else if (month == 2) {
@@ -238,12 +238,11 @@ void stage_3_table(weather_data_t *data, int line_count, int month) {
   } else if (month == 12) {
     printf("S3, Dec |");
   }
-  // FIX: month with no data has incorrect postion for "|"
   for (int i = -5; i < 50; i++) {
     if (i == 49) {
       printf("|");
       break;
-    } else if (i < round(result->min) - 1 || i >= round(result->max)) {
+    } else if (i < round(result.min) - 1 || i >= round(result.max)) {
       printf(" ");
     } else {
       printf("*");
@@ -273,6 +272,7 @@ int main() {
   max_data_t *max = find_max(data, line_count);
   // stage 1 result
   stage_1_result(data, line_count, max);
+  free(max);
   // stage 2 result
   stage_2_result(data, line_count);
   // stage 3 result
