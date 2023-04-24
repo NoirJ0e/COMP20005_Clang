@@ -100,7 +100,7 @@ weather_data_t *read_input(weather_data_t total[], int *line_count) {
       break;
     } else if (result != 8) {
       printf("Error: input file not correct at line %d", position + 1);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 
     total[position].position =
