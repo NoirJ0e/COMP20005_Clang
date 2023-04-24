@@ -70,6 +70,10 @@ weather_data_t *read_input(int *line_count) {
   // TODO: Sort this array by hour, this should boost efficiency for following
   // stage
   weather_data_t *total = malloc(sizeof(weather_data_t) * MAX_LINE);
+  if (total == NULL) {
+    printf("Error: malloc failed");
+    exit(1);
+  }
   *line_count = 0;
   int position = 0;
 
@@ -94,6 +98,10 @@ weather_data_t *read_input(int *line_count) {
 // TODO: find a way to boost its efficiency
 max_data_t *find_max(weather_data_t *data, int line_count) {
   max_data_t *max = malloc(sizeof(max_data_t));
+  if (max == NULL) {
+    printf("Error: malloc failed");
+    exit(1);
+  }
   // as this is pointer, use -> instead of .
   max->solar = 0;
   max->wind = 0;
@@ -197,7 +205,7 @@ month_cap_t find_month_cap(weather_data_t *data, int line_count, int month) {
   month_cap_t result;
   result.max = 0.0;
   result.min = 30.0; // assume the lowest temperature is 30, if set to 0 it's
-                      // so hard to change
+                     // so hard to change
   for (int i = 0; i < line_count; i++) {
     if (data[i].month == month) {
       if (data[i].temp > result.max) {
