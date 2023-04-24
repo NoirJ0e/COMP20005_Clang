@@ -153,7 +153,7 @@ void print_stage_1_result(weather_data_t *data, int line_count, max_data_t max) 
   printf("\n");
 }
 
-int avg_hourly_solar(weather_data_t *data, int line_count, int month,
+int calc_avg_hourly_solar(weather_data_t *data, int line_count, int month,
                      int hour) {
   solar_hourly_t result;
   result.month = month;
@@ -178,11 +178,11 @@ void stage_2_table_content(weather_data_t *data, int line_count, int month,
   for (int hr = 1; hr <= hour; hr++) {
     printf("S2, %02d-%02d |", hr - 1, hr);
     for (int m = 1; m <= month; m++) {
-      if (avg_hourly_solar(data, line_count, m, hr - 1) >= 0.5) {
+      if (calc_avg_hourly_solar(data, line_count, m, hr - 1) >= 0.5) {
         if (m == 12) {
-          printf(" %3d\n", avg_hourly_solar(data, line_count, m, hr - 1));
+          printf(" %3d\n", calc_avg_hourly_solar(data, line_count, m, hr - 1));
         } else {
-          printf(" %3d ", avg_hourly_solar(data, line_count, m, hr - 1));
+          printf(" %3d ", calc_avg_hourly_solar(data, line_count, m, hr - 1));
         }
       } else {
         if (m == 12) {
