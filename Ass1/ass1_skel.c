@@ -50,6 +50,7 @@
 #define MAX_LINE 99999
 
 // TODO: Add comment
+// NOTE: pass by reference or by value for line_count ?
 
 typedef struct {
   int year, month, day, hour, minute;
@@ -67,13 +68,17 @@ typedef struct {
 } solar_hourly_t;
 
 weather_data_t *read_input(int *line_count) {
-  // TODO: Sort this array by hour, this should boost efficiency for following
-  // stage
+  // lines in each input file is not same, so use dynamic allocation to create
+  // variable array in order to reduce potential memory usage
   weather_data_t *total = malloc(sizeof(weather_data_t) * MAX_LINE);
   if (total == NULL) {
     printf("Error: malloc failed");
     exit(1);
   }
+
+  // as we don't know how many lines in the input file, use a variable to record
+  // the line count because it will be modified in this function, it need to be
+  // passed by reference
   *line_count = 0;
   int position = 0;
 
@@ -81,48 +86,52 @@ weather_data_t *read_input(int *line_count) {
   scanf("%*[^\n]%*c");
 
   // read the weather data into the array
-  while (position < MAX_LINE &&
-         scanf("%d %d %d %d %d %lf %lf %lf", &total[position].year,
-               &total[position].month, &total[position].day,
-               &total[position].hour, &total[position].minute,
-               &total[position].solar, &total[position].wind,
-               &total[position].temp) == 8) {
-    total[position].position = position;
+  while (position < MAX_LINE) {
+    int result = scanf("%d %d %d %d %d %lf %lf %lf", &total[position].year,
+                       &total[position].month, &total[position].day,
+                       &total[position].hour, &total[position].minute,
+                       &total[position].solar, &total[position].wind,
+                       &total[position].temp);
+    if (result == EOF) {
+      break;
+    } else if (result != 8) {
+      printf("Error: input file not correct at line %d", position + 1);
+      exit(1);
+    }
+
+    total[position].position =
+        position; // stage 1 require first and last row of data input
     position++;
   }
 
-  *line_count = position;
+  *line_count = position; // update the total line count
   return total;
 }
 
 // TODO: find a way to boost its efficiency
-max_data_t *find_max(weather_data_t *data, int line_count) {
-  max_data_t *max = malloc(sizeof(max_data_t));
-  if (max == NULL) {
-    printf("Error: malloc failed");
-    exit(1);
-  }
-  // as this is pointer, use -> instead of .
-  max->solar = 0;
-  max->wind = 0;
-  max->temp = 0;
+max_data_t find_max(weather_data_t *data, int line_count) {
+  max_data_t max;
+  // initialize the max value
+  max.solar = 0;
+  max.wind = 0;
+  max.temp = 0;
 
   for (int i = 0; i < line_count; i++) {
-    if (data[i].solar > max->solar) {
-      max->solar = data[i].solar;
+    if (data[i].solar > max.solar) {
+      max.solar = data[i].solar;
     }
-    if (data[i].wind > max->wind) {
-      max->wind = data[i].wind;
+    if (data[i].wind > max.wind) {
+      max.wind = data[i].wind;
     }
-    if (data[i].temp > max->temp) {
-      max->temp = data[i].temp;
+    if (data[i].temp > max.temp) {
+      max.temp = data[i].temp;
     }
   }
 
   return max;
 }
 
-void stage_1_result(weather_data_t *data, int line_count, max_data_t *max) {
+void print_stage_1_result(weather_data_t *data, int line_count, max_data_t max) {
   printf("S1, %d data rows in total\n", line_count);
   printf("S1, row %5d: at %02d:%02d on %02d/%02d/%4d, solar = %4.0lf, wind = "
          "%5.2lf, temp = %4.1lf\n",
@@ -140,7 +149,7 @@ void stage_1_result(weather_data_t *data, int line_count, max_data_t *max) {
   printf("S1, max solar = %4.0lf\n"
          "S1, max wind  = %4.1lf\n"
          "S1, max temp  = %4.1lf\n",
-         max->solar, max->wind, max->temp);
+         max.solar, max.wind, max.temp);
   printf("\n");
 }
 
@@ -186,7 +195,7 @@ void stage_2_table_content(weather_data_t *data, int line_count, int month,
   }
 }
 
-void stage_2_result(weather_data_t *data, int line_count) {
+void print_stage_2_result(weather_data_t *data, int line_count) {
   printf("S2,              Average Solar Energy by Month and Time of Day\n");
   printf("S2,        Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  "
          "Dec\n");
@@ -204,8 +213,10 @@ typedef struct {
 month_cap_t find_month_cap(weather_data_t *data, int line_count, int month) {
   month_cap_t result;
   result.max = 0.0;
-  result.min = 30.0; // assume the lowest temperature is 30, if set to 0 it's
+  result.min = 50.0; // assume the lowest temperature is 50, if set to 0 it's
                      // so hard to change
+
+  // update the max and min value
   for (int i = 0; i < line_count; i++) {
     if (data[i].month == month) {
       if (data[i].temp > result.max) {
@@ -219,7 +230,7 @@ month_cap_t find_month_cap(weather_data_t *data, int line_count, int month) {
   return result;
 }
 
-void stage_3_table(weather_data_t *data, int line_count, int month) {
+void create_stage_3_table(weather_data_t *data, int line_count, int month) {
   month_cap_t result = find_month_cap(data, line_count, month);
   if (month == 1) {
     printf("S3, Jan |");
@@ -258,13 +269,13 @@ void stage_3_table(weather_data_t *data, int line_count, int month) {
   }
 }
 
-void stage_3_result(weather_data_t *data, int line_count) {
+void print_stage_3_result(weather_data_t *data, int line_count) {
   printf("S3,                  Min/Max Temperature by Month\n");
   printf("S3,    -5    0    5   10   15   20   25   30   35   40   45   50\n");
   printf("S3,     "
          "+----+----+----+----+----+----+----+----+----+----+----+\n");
   for (int i = 1; i <= 12; i++) {
-    stage_3_table(data, line_count, i);
+    create_stage_3_table(data, line_count, i);
     printf("\n");
   }
   printf("S3,     +----+----+----+----+----+----+----+----+----+----+----+\n");
@@ -277,14 +288,13 @@ int main() {
   int line_count = 0;
   // all input data will be stored in this array
   weather_data_t *data = read_input(&line_count);
-  max_data_t *max = find_max(data, line_count);
+  max_data_t max = find_max(data, line_count);
   // stage 1 result
-  stage_1_result(data, line_count, max);
-  free(max);
+  print_stage_1_result(data, line_count, max);
   // stage 2 result
-  stage_2_result(data, line_count);
+  print_stage_2_result(data, line_count);
   // stage 3 result
-  stage_3_result(data, line_count);
+  print_stage_3_result(data, line_count);
   free(data); // free the memory allocated for the data array
   return 0;
 }
