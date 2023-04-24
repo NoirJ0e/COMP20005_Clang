@@ -50,6 +50,7 @@
 /*******************************************************************/
 
 #define MAX_LINE 99999
+#define LEAST_RES 0.5
 
 // customized structs
 
@@ -172,7 +173,7 @@ int calc_avg_hourly_solar(weather_data_t *data, int line_count, int month,
     }
   }
   // with <math.h>
-  if (round(result.sum / result.count) >= 0.5) {
+  if (round(result.sum / result.count) >= LEAST_RES) { // by requirement, if result < 0.5 then return ..
     return round(result.sum / result.count);
   } else {
     return 0;
@@ -185,7 +186,7 @@ void stage_2_table_content(weather_data_t *data, int line_count, int month,
   for (int hr = 1; hr <= hour; hr++) {
     printf("S2, %02d-%02d |", hr - 1, hr);
     for (int m = 1; m <= month; m++) {
-      if (calc_avg_hourly_solar(data, line_count, m, hr - 1) >= 0.5) {
+      if (calc_avg_hourly_solar(data, line_count, m, hr - 1) >= LEAST_RES) {
         if (m == 12) {
           printf(" %3d\n", calc_avg_hourly_solar(data, line_count, m, hr - 1));
         } else {
