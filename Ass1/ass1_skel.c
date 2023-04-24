@@ -38,6 +38,8 @@
    Signed by: Zilin Xu 1262248
    Dated:     2023/04/12
 
+   Programming is fun!
+
 */
 
 #include <assert.h>
@@ -48,9 +50,6 @@
 /*******************************************************************/
 
 #define MAX_LINE 99999
-
-// TODO: Add comment
-// NOTE: pass by reference or by value for line_count ?
 
 typedef struct {
   int year, month, day, hour, minute;
@@ -67,14 +66,11 @@ typedef struct {
   double sum;
 } solar_hourly_t;
 
-weather_data_t *read_input(int *line_count) {
+// read the input file and return the data in a dynamic array
+
+weather_data_t *read_input(weather_data_t total[],int *line_count) {
   // lines in each input file is not same, so use dynamic allocation to create
   // variable array in order to reduce potential memory usage
-  weather_data_t *total = malloc(sizeof(weather_data_t) * MAX_LINE);
-  if (total == NULL) {
-    printf("Error: malloc failed");
-    exit(1);
-  }
 
   // as we don't know how many lines in the input file, use a variable to record
   // the line count because it will be modified in this function, it need to be
@@ -108,13 +104,21 @@ weather_data_t *read_input(int *line_count) {
   return total;
 }
 
-// TODO: find a way to boost its efficiency
+// PERF: use quick sort to sort for solar, wind and temp, then take the first and last element
+void swap(weather_data_t *a, weather_data_t *b) {
+  weather_data_t temp = *a;
+  *a = *b;
+  *b = temp;
+}
+
+// find the maxvalue of solar, wind and temp in the data
 max_data_t find_max(weather_data_t *data, int line_count) {
   max_data_t max;
   // initialize the max value
   max.solar = 0;
   max.wind = 0;
   max.temp = 0;
+
 
   for (int i = 0; i < line_count; i++) {
     if (data[i].solar > max.solar) {
@@ -131,6 +135,7 @@ max_data_t find_max(weather_data_t *data, int line_count) {
   return max;
 }
 
+// print out the result of stage 1
 void print_stage_1_result(weather_data_t *data, int line_count, max_data_t max) {
   printf("S1, %d data rows in total\n", line_count);
   printf("S1, row %5d: at %02d:%02d on %02d/%02d/%4d, solar = %4.0lf, wind = "
@@ -153,6 +158,7 @@ void print_stage_1_result(weather_data_t *data, int line_count, max_data_t max) 
   printf("\n");
 }
 
+// calculate average solar for each hour gap in each month
 int calc_avg_hourly_solar(weather_data_t *data, int line_count, int month,
                      int hour) {
   solar_hourly_t result;
@@ -173,6 +179,7 @@ int calc_avg_hourly_solar(weather_data_t *data, int line_count, int month,
   }
 }
 
+// print out the result of stage 2 table
 void stage_2_table_content(weather_data_t *data, int line_count, int month,
                            int hour) {
   for (int hr = 1; hr <= hour; hr++) {
@@ -195,6 +202,7 @@ void stage_2_table_content(weather_data_t *data, int line_count, int month,
   }
 }
 
+// print out the final result of stage 2
 void print_stage_2_result(weather_data_t *data, int line_count) {
   printf("S2,              Average Solar Energy by Month and Time of Day\n");
   printf("S2,        Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  "
@@ -210,6 +218,7 @@ typedef struct {
   double min;
 } month_cap_t;
 
+// find the max and min temperature in the data for each month
 month_cap_t find_month_cap(weather_data_t *data, int line_count, int month) {
   month_cap_t result;
   result.max = 0.0;
@@ -230,6 +239,7 @@ month_cap_t find_month_cap(weather_data_t *data, int line_count, int month) {
   return result;
 }
 
+// create stage 3 table content, the graph
 void create_stage_3_table(weather_data_t *data, int line_count, int month) {
   month_cap_t result = find_month_cap(data, line_count, month);
   if (month == 1) {
@@ -269,6 +279,7 @@ void create_stage_3_table(weather_data_t *data, int line_count, int month) {
   }
 }
 
+// print out the final result of stage 3
 void print_stage_3_result(weather_data_t *data, int line_count) {
   printf("S3,                  Min/Max Temperature by Month\n");
   printf("S3,    -5    0    5   10   15   20   25   30   35   40   45   50\n");
@@ -286,8 +297,9 @@ void print_stage_3_result(weather_data_t *data, int line_count) {
 
 int main() {
   int line_count = 0;
+  weather_data_t total[MAX_LINE];
   // all input data will be stored in this array
-  weather_data_t *data = read_input(&line_count);
+  weather_data_t *data = read_input(total,&line_count);
   max_data_t max = find_max(data, line_count);
   // stage 1 result
   print_stage_1_result(data, line_count, max);
@@ -295,6 +307,6 @@ int main() {
   print_stage_2_result(data, line_count);
   // stage 3 result
   print_stage_3_result(data, line_count);
-  free(data); // free the memory allocated for the data array
+  // free(data); // free the memory allocated for the data array
   return 0;
 }
