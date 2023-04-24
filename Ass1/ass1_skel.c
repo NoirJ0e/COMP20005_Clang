@@ -51,6 +51,8 @@
 
 #define MAX_LINE 99999
 
+// customized structs
+
 typedef struct {
   int year, month, day, hour, minute;
   double solar, wind, temp;
@@ -66,8 +68,13 @@ typedef struct {
   double sum;
 } solar_hourly_t;
 
-// read the input file and return the data in a dynamic array
+typedef struct {
+  double max;
+  double min;
+} month_cap_t;
 
+
+// read the input file and return the data in a dynamic array
 weather_data_t *read_input(weather_data_t total[], int *line_count) {
   // lines in each input file is not same, so use dynamic allocation to create
   // variable array in order to reduce potential memory usage
@@ -102,14 +109,6 @@ weather_data_t *read_input(weather_data_t total[], int *line_count) {
 
   *line_count = position; // update the total line count
   return total;
-}
-
-// PERF: use quick sort to sort for solar, wind and temp, then take the first
-// and last element
-void swap(weather_data_t *a, weather_data_t *b) {
-  weather_data_t temp = *a;
-  *a = *b;
-  *b = temp;
 }
 
 // find the maxvalue of solar, wind and temp in the data
@@ -214,11 +213,6 @@ void print_stage_2_result(weather_data_t *data, int line_count) {
   printf("\n");
 }
 
-typedef struct {
-  double max;
-  double min;
-} month_cap_t;
-
 // find the max and min temperature in the data for each month
 month_cap_t find_month_cap(weather_data_t *data, int line_count, int month) {
   month_cap_t result;
@@ -316,12 +310,11 @@ int main() {
   // all input data will be stored in this array
   weather_data_t *data = read_input(total, &line_count);
   max_data_t max = find_max(data, line_count);
-  // stage 1 result
+  // print stage 1 result
   print_stage_1_result(data, line_count, max);
-  // stage 2 result
+  // print stage 2 result
   print_stage_2_result(data, line_count);
-  // stage 3 result
+  // print stage 3 result
   print_stage_3_result(data, line_count);
-  // free(data); // free the memory allocated for the data array
   return 0;
 }
