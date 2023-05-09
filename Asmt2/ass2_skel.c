@@ -40,16 +40,88 @@
 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /*******************************************************************/
 
+#define MAX_DATA 100
+#define P0 0.00002
+#define W0 1e-12
+#define ALPHA 0.5
+#define Q 2
 
-int
-main(int argc, char *argv[]) {
+// dx = distance to East, dy = distance to North
+// lx = loudness at x, ly = loudness at y
+// lo = loudness at origin
+typedef struct {
+  double dx, dy, power;
+  double lx, ly, lo;
+} sound_data_t;
 
-	return 0;
+// calculation functions
+double calc_powi(double power) {
+  return 10 * log10(power / W0);
+}
+
+double calc_spli(double powi, double ri) {
+  double r = (2+ALPHA) * M_PI * pow(ri,2);
+  return powi + 10 * log10(Q/(4 * M_PI * pow(ri, 2)) + 4/r);
+}
+
+double calc_spl_total(double dB_east, double dB_north) {
+  return 10 * log10(pow(10, dB_east/10) + pow(10, dB_north/10));
+}
+
+
+// read data from file, store each into corresponding attribute 
+// and record total number of data
+sound_data_t *read_data(sound_data_t data[], int *src_count) {
+  int line_count = 0;
+  while (line_count < MAX_DATA) {
+    double result = scanf("%lf%lf%lf", &data[line_count].dx,
+                          &data[line_count].dy, &data[line_count].power);
+    if (result == EOF) {
+      break;
+    } else if (result != 3) {
+      printf("Invalid input\n");
+      exit(EXIT_FAILURE);
+    }
+    line_count++;
+  }
+
+  *src_count = line_count;
+
+  return data;
+}
+
+// stage 1
+void calc_stage1_loudness(sound_data_t data[], int src_count) {
+  for (int i = 0; i < src_count; i++) {
+    data[i].lo = calc_spli(calc_powi(data[i].power), sqrt(pow(data[i].dx, 2) + pow(data[i].dy, 2)));
+  }
+}
+//
+void stage_1_result(sound_data_t data[], int src_count) {
+  printf("S1, number of sound sources = %d\n", src_count);
+  for (int i = 0; i < src_count; i++) {
+    printf("S1, %3.1lfm E, %3.1lfm N, power of %7.5lfW, contributes %3.1lf dB at origin\n",
+           data[i].dx, data[i].dy, data[i].power, data[i].lo);
+  }
+}
+
+
+int main(int argc, char *argv[]) {
+  int src_count = 0;
+  sound_data_t source[MAX_DATA];
+  sound_data_t *data = read_data(data, &src_count);
+
+  printf("src_count: %d\n", src_count);
+
+  calc_stage1_loudness(data, src_count);
+  stage_1_result(data, src_count);
+
+  return 0;
 }

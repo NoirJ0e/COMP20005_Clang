@@ -1,0 +1,7 @@
+src_count: 5
+S1, number of sound sources = 5
+S1, 30.0m E, 70.0m N, power of 0.00050W, contributes 47.6 dB at origin
+S1, 35.0m E, 63.0m N, power of 0.00060W, contributes 48.9 dB at origin
+S1, 36.5m E, 27.0m N, power of 0.00080W, contributes 54.1 dB at origin
+S1, 70.0m E, 25.0m N, power of 0.00200W, contributes 53.8 dB at origin
+S1, 20.0m E, 50.0m N, power of 0.00250W, contributes 57.6 dB at origin
