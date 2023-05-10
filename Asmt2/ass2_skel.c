@@ -52,6 +52,11 @@
 #define W0 1e-12
 #define ALPHA 0.5
 #define Q 2
+#define FIELD_SIZE 7400
+#define WIDTH 74
+#define HEIGHT 100
+#define DANGER_LEVEL 80
+#define PI 3.141592653589793238
 
 // dx = distance to East, dy = distance to North
 // lx = loudness at x, ly = loudness at y
@@ -62,21 +67,33 @@ typedef struct {
 } sound_data_t;
 
 // calculation functions
-double calc_powi(double power) {
-  return 10 * log10(power / W0);
-}
+double calc_powi(double power) { return 10 * log10(power / W0); }
 
 double calc_spli(double powi, double ri) {
-  double r = (2+ALPHA) * M_PI * pow(ri,2);
-  return powi + 10 * log10(Q/(4 * M_PI * pow(ri, 2)) + 4/r);
+  double r = (2 + ALPHA) * PI * pow(ri, 2);
+  return powi + 10 * log10(Q / (4 * PI * pow(ri, 2)) + 4 / r);
 }
 
-double calc_spl_total(double dB_east, double dB_north) {
-  return 10 * log10(pow(10, dB_east/10) + pow(10, dB_north/10));
+double calc_dist(double x, double y) { return sqrt(pow(x, 2) + pow(y, 2)); }
+
+double calc_spl_total(double data[], int src_count) {
+  double spli_total = 0;
+  for (int i = 0; i < src_count; i++) {
+    spli_total += pow(10, data[i] / 10);
+  }
+
+  double intensity = 10 * log10(spli_total);
+  return intensity;
 }
 
+// calculate the number of points of intersetion with grids in the field
 
-// read data from file, store each into corresponding attribute 
+// calculate the number of points of intersetion with grids in the field
+int calc_intersections_quantity(double gridlength) {
+  return (int)(WIDTH / gridlength + 1) * (HEIGHT / gridlength + 1);
+}
+
+// read data from file, store each into corresponding attribute
 // and record total number of data
 sound_data_t *read_data(sound_data_t data[], int *src_count) {
   int line_count = 0;
@@ -100,28 +117,65 @@ sound_data_t *read_data(sound_data_t data[], int *src_count) {
 // stage 1
 void calc_stage1_loudness(sound_data_t data[], int src_count) {
   for (int i = 0; i < src_count; i++) {
-    data[i].lo = calc_spli(calc_powi(data[i].power), sqrt(pow(data[i].dx, 2) + pow(data[i].dy, 2)));
+    data[i].lo =
+        calc_spli(calc_powi(data[i].power), calc_dist(data[i].dx, data[i].dy));
   }
 }
-//
+
 void stage_1_result(sound_data_t data[], int src_count) {
   printf("S1, number of sound sources = %d\n", src_count);
   for (int i = 0; i < src_count; i++) {
-    printf("S1, %3.1lfm E, %3.1lfm N, power of %7.5lfW, contributes %3.1lf dB at origin\n",
+    printf("S1, %3.1lfm E, %3.1lfm N, power of %7.5lfW, contributes %3.1lf dB "
+           "at origin\n",
            data[i].dx, data[i].dy, data[i].power, data[i].lo);
   }
 }
 
+void stage_2_result(sound_data_t data[], int src_count) {
+  // gridLength = 0.25, 0.5, 1.0
+  // TODO: starting from 0.25 and determine on the left or right, reduce
+  // calculation, current one is pure bruth force
+  for (double gridLength = 1.0; gridLength >= 0.25; gridLength /= 2) {
+    int dangerCount = 0;
+    for (double y = HEIGHT + 1; y >= 0; y -= gridLength) {
+      for (double x = 0; x <= WIDTH + 1; x += gridLength) {
+        double spl_at_each_point[src_count];
+        // This for loop calculate the SPL at certain cordinates in the field
+        // from the sound sources and store them in an array in order to
+        // calculate the total SPL at that point
+        for (int i = 0; i < src_count; i++) {
+          if (data[i].dx == x && data[i].dy == y) {
+            // WARN: this should raise a divide by 0 error but it's not, need to
+            // understand why
+            /* if (data[i].dx - x == 0 && data[i].dy - y == 0) {
+              printf("Equal to ZERO\n");
+            } */
+          }
+          double dist = calc_dist(x - data[i].dx, y - data[i].dy);
+          double spli = calc_spli(calc_powi(data[i].power), dist);
+          spl_at_each_point[i] = spli;
+        }
+        double spl_total = calc_spl_total(spl_at_each_point, src_count);
+        if (spl_total >= DANGER_LEVEL) {
+          dangerCount++;
+        }
+      }
+    }
+    printf("S2, grid = %4.2lf, danger points = %6d / %6d = %4.2lf%%\n",
+           gridLength, dangerCount, calc_intersections_quantity(gridLength),
+           (dangerCount * 100.0) / calc_intersections_quantity(gridLength));
+  }
+}
 
 int main(int argc, char *argv[]) {
   int src_count = 0;
   sound_data_t source[MAX_DATA];
-  sound_data_t *data = read_data(data, &src_count);
-
-  printf("src_count: %d\n", src_count);
+  sound_data_t *data = read_data(source, &src_count);
 
   calc_stage1_loudness(data, src_count);
   stage_1_result(data, src_count);
+  printf("\n");
+  stage_2_result(data, src_count);
 
   return 0;
 }

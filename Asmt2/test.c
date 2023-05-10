@@ -7,6 +7,11 @@
 #define W0 1e-12
 #define ALPHA 0.5
 #define Q 2
+#define FIELD_SIZE 7400
+#define WIDTH 74
+#define HEIGHT 100
+#define DANGER_LEVEL 80
+#define PI 3.141592653589793238
 
 
 double calc_powi(double power) {
@@ -23,21 +28,11 @@ double calc_spl_total(double dB_east, double dB_north) {
 }
 
 int main() {
-  double power = 0.0006;
-  double east = 35.0, north = 63.0, test = sqrt(pow(east, 2) + pow(north, 2));
-
-  double dB_east = calc_spli(calc_powi(power), east);
-  printf("%lf\n", dB_east);
-
-  double dB_north = calc_spli(calc_powi(power), north);
-  printf("%lf\n", dB_north);
-
-  double dB_origin = calc_spl_total(dB_east, dB_north);
-  printf("%lf\n", dB_origin);
-
-  double dB_test = calc_spli(calc_powi(power), test);
-  printf("%lf\n", dB_test);
-
+  if (0 == 0.0) {
+    printf("1");
+  } else {
+    printf("2");
+  }
 
   return 0;
 }
