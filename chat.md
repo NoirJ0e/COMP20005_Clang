@@ -1,47 +1,6 @@
-/* Program to create sound-level maps.
+I got a C-lang function:
 
-   Skeleton written by Alistair Moffat, ammoffat@unimelb.edu.au,
-   April 2023, with the intention that it be modified by students
-   to add functionality, as required by the assignment specification.
-
-   Student Authorship Declaration:
-
-   (1) I certify that except for the code provided in the initial skeleton
-   file, the  program contained in this submission is completely my own
-   individual work, except where explicitly noted by further comments that
-   provide details otherwise.  I understand that work that has been developed
-   by another student, or by me in collaboration with other students, or by
-   non-students as a result of request, solicitation, or payment, may not be
-   submitted for assessment in this subject.  I understand that submitting for
-   assessment work developed by or in collaboration with other students or
-   non-students constitutes Academic Misconduct, and may be penalized by mark
-   deductions, or by other penalties determined via the University of
-   Melbourne Academic Honesty Policy, as described at
-   https://academicintegrity.unimelb.edu.au.
-
-   (2) I also certify that I have not provided a copy of this work in either
-   softcopy or hardcopy or any other form to any other student, and nor will I
-   do so until after the marks are released. I understand that providing my
-   work to other students, regardless of my intention or any undertakings made
-   to me by that other student, is also Academic Misconduct.
-
-   (3) I further understand that providing a copy of the assignment
-   specification to any form of code authoring or assignment tutoring service,
-   or drawing the attention of others to such services and code that may have
-   been made available via such a service, may be regarded as Student General
-   Misconduct (interfering with the teaching activities of the University
-   and/or inciting others to commit Academic Misconduct).  I understand that
-   an allegation of Student General Misconduct may arise regardless of whether
-   or not I personally make use of such solutions or sought benefit from such
-   actions.
-
-   Signed by: Zilin Xu 1262248
-   Dated:     09/05/2023
-
-   Programming is fun!
-
-*/
-
+```c
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -55,8 +14,8 @@
 #define ALPHA 0.5
 #define Q 2
 #define FIELD_SIZE 7400
-#define WIDTH 74.0
-#define HEIGHT 100.0
+#define WIDTH 74
+#define HEIGHT 100
 #define DANGER_LEVEL 80
 #define PI 3.141592653589793238
 
@@ -69,11 +28,11 @@ typedef struct {
 } sound_data_t;
 
 // function prototypes
-double calc_pow_i(double power);
-double calc_spl_i(double powi, double ri);
-double calc_prms(double x, double y);
+double calc_powi(double power);
+double calc_spli(double powi, double ri);
+double calc_dist(double x, double y);
 double calc_spl_total(double data[], int src_count);
-int stage_3_table_content(double spl_total);
+int calc_display_number(double spl_total);
 int calc_intersections_quantity(double gridlength);
 sound_data_t *read_data(sound_data_t data[], int *src_count);
 void calc_stage1_loudness(sound_data_t data[], int src_count);
@@ -82,14 +41,14 @@ void stage_2_result(sound_data_t data[], int src_count);
 void stage_3_result(sound_data_t data[], int src_count);
 
 // calculation functions
-double calc_pow_i(double power) { return 10 * log10(power / W0); }
+double calc_powi(double power) { return 10 * log10(power / W0); }
 
-double calc_spl_i(double powi, double ri) {
+double calc_spli(double powi, double ri) {
   double r = (2 + ALPHA) * PI * pow(ri, 2);
   return powi + 10 * log10(Q / (4 * PI * pow(ri, 2)) + 4 / r);
 }
 
-double calc_prms(double x, double y) { return sqrt(pow(x, 2) + pow(y, 2)); }
+double calc_dist(double x, double y) { return sqrt(pow(x, 2) + pow(y, 2)); }
 
 double calc_spl_total(double data[], int src_count) {
   double spli_total = 0;
@@ -97,34 +56,53 @@ double calc_spl_total(double data[], int src_count) {
     spli_total += pow(10, data[i] / 10);
   }
 
-  return 10 * log10(spli_total); // spl_total, according to formula
+  double intensity = 10 * log10(spli_total);
+  return intensity;
 }
+
+// calculate the number of points of intersetion with grids in the field
 
 // calculate the number of points of intersetion with grids in the field
 int calc_intersections_quantity(double gridlength) {
   return (int)(WIDTH / gridlength + 1) * (HEIGHT / gridlength + 1);
 }
 
-int stage_3_table_content(double spl_total) {
-  if (20 < spl_total && spl_total < 25) {
-    return 2;
+int calc_display_number(double spl_total) {
+  int result = 0;
+  if (spl_total < 20) {
+    result = 0;
+  } else if (20 < spl_total && spl_total < 25) {
+    result = 2;
+  } else if (25 < spl_total && spl_total < 30) {
+    result = 0;
   } else if (30 < spl_total && spl_total < 35) {
-    return 3;
+    result = 3;
+  } else if (35 < spl_total && spl_total < 40) {
+    result = 0;
   } else if (40 < spl_total && spl_total < 45) {
-    return 4;
+    result = 4;
+  } else if (45 < spl_total && spl_total < 50) {
+    result = 0;
   } else if (50 < spl_total && spl_total < 55) {
-    return 5;
+    result = 5;
+  } else if (55 < spl_total && spl_total < 60) {
+    result = 0;
   } else if (60 < spl_total && spl_total < 65) {
-    return 6;
+    result = 6;
+  } else if (65 < spl_total && spl_total < 70) {
+    result = 0;
   } else if (70 < spl_total && spl_total < 75) {
-    return 7;
+    result = 7;
+  } else if (75 < spl_total && spl_total < 80) {
+    result = 0;
   } else if (80 < spl_total && spl_total < 85) {
-    return 8;
+    result = 8;
+  } else if (85 < spl_total && spl_total < 90) {
+    result = 0;
   } else if (90 <= spl_total) {
-    return 9;
-  } else {
-    return 0;
+    result = 9;
   }
+  return result;
 }
 
 // read data from file, store each into corresponding attribute
@@ -152,7 +130,7 @@ sound_data_t *read_data(sound_data_t data[], int *src_count) {
 void calc_stage1_loudness(sound_data_t data[], int src_count) {
   for (int i = 0; i < src_count; i++) {
     data[i].lo =
-        calc_spl_i(calc_pow_i(data[i].power), calc_prms(data[i].dx, data[i].dy));
+        calc_spli(calc_powi(data[i].power), calc_dist(data[i].dx, data[i].dy));
   }
 }
 
@@ -171,15 +149,15 @@ void stage_2_result(sound_data_t data[], int src_count) {
   // calculation, current one is pure bruth force
   for (double gridLength = 1.0; gridLength >= 0.25; gridLength /= 2) {
     int dangerCount = 0;
-    for (double y = HEIGHT ; y >= 0; y -= gridLength) {
-      for (double x = 0; x <= WIDTH ; x += gridLength) {
+    for (double y = HEIGHT + 1; y >= 0; y -= gridLength) {
+      for (double x = 0; x <= WIDTH + 1; x += gridLength) {
         double spl_at_each_point[src_count];
         // This for loop calculate the SPL at certain cordinates in the
         // field from the sound sources and store them in an array in
         // order to calculate the total SPL at that point
         for (int i = 0; i < src_count; i++) {
-          double dist = calc_prms(x - data[i].dx, y - data[i].dy);
-          double spli = calc_spl_i(calc_pow_i(data[i].power), dist);
+          double dist = calc_dist(x - data[i].dx, y - data[i].dy);
+          double spli = calc_spli(calc_powi(data[i].power), dist);
           spl_at_each_point[i] = spli;
         }
         double spl_total = calc_spl_total(spl_at_each_point, src_count);
@@ -199,12 +177,12 @@ void stage_3_result(sound_data_t data[], int src_count) {
     double spl_at_each_point[src_count];
     for (double x = 0.5; x < WIDTH; x++) {
       for (int i = 0; i < src_count; i++) {
-        double dist = calc_prms(x - data[i].dx, y - data[i].dy);
-        double spli = calc_spl_i(calc_pow_i(data[i].power), dist);
+        double dist = calc_dist(x - data[i].dx, y - data[i].dy);
+        double spli = calc_spli(calc_powi(data[i].power), dist);
         spl_at_each_point[i] = spli;
       }
       double spl_total = calc_spl_total(spl_at_each_point, src_count);
-      int result = stage_3_table_content(spl_total);
+      int result = calc_display_number(spl_total);
 
       if (x == 0.5) { // Beginning of each row
         if (result != 0) {
@@ -247,3 +225,43 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
+```
+
+When dealing with dataset 1 
+
+30.0 70.0 0.0005
+35.0 63.0 0.0006
+36.5 27.0 0.0008
+70.0 25.0 0.0020
+20.0 50.0 0.0025
+
+It have the correct danger point result output, which are 
+
+S2, grid = 1.00m, danger points =    140 /   7575 = 1.85%
+S2, grid = 0.50m, danger points =    570 /  29949 = 1.90%
+S2, grid = 0.25m, danger points =   2230 / 119097 = 1.87%
+
+However, when dealing with dataset 3 
+
+0.1 0.1 0.00001
+0.1 33.3 0.00010
+0.1 66.7 0.00001
+0.1 99.9 0.00001
+37.0 0.1 0.00001
+37.0 99.9 0.00001
+73.9 0.1 0.00001
+73.9 33.3 0.00001
+73.9 66.7 0.00010
+73.9 99.9 0.00001
+
+My output are:
+
+S2, grid = 1.00m, danger points =     10 /   7575 = 0.13%
+S2, grid = 0.50m, danger points =     24 /  29949 = 0.08%
+S2, grid = 0.25m, danger points =     87 / 119097 = 0.07%
+
+But the correct output should be:
+
+S2, grid = 1.00m, danger points =     10 /   7575 = 0.13%
+S2, grid = 0.50m, danger points =     22 /  29949 = 0.07%
+S2, grid = 0.25m, danger points =     76 / 119097 = 0.06%

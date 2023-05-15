@@ -13,26 +13,26 @@
 #define DANGER_LEVEL 80
 #define PI 3.141592653589793238
 
+int calc_display_number(double spl_total) {
+  int result = 0;
+  static const int result_values[] = {0, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9};
+  static const double range_values[] = {20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90};
+  static const int num_ranges = sizeof(range_values) / sizeof(range_values[0]);
 
-double calc_powi(double power) {
-  return 10 * log10(power / W0);
-}
-
-double calc_spli(double powi, double ri) {
-  double r = (2+ALPHA) * M_PI * pow(ri,2);
-  return powi + 10 * log10(Q/(4 * M_PI * pow(ri, 2)) + 4/r);
-}
-
-double calc_spl_total(double dB_east, double dB_north) {
-  return 10 * log10(pow(10, dB_east/10) + pow(10, dB_north/10));
-}
-
-int main() {
-  if (0 == 0.0) {
-    printf("1");
-  } else {
-    printf("2");
+  for (int i = 0; i < num_ranges; i++) {
+    if (spl_total < range_values[i]) {
+      break;
+    }
+    result = result_values[i];
   }
 
+  return result;
+}
+
+int main(void) {
+  double spl_total = 81.0;
+  int result = calc_display_number(spl_total);
+  printf("result: %d\n", result);
   return 0;
+
 }
