@@ -60,9 +60,9 @@
 #define DANGER_LEVEL 80
 #define PI 3.141592653589793238
 
-// dx = distance to East, dy = distance to North
-// lx = loudness at x, ly = loudness at y
-// lo = loudness at origin
+// dx = distance to East, dy = distance to North, power = power of sound source
+// lx = loudness at x, ly = loudness at y, lo = loudness at origin
+// lo used in stage 1 only, lx and ly are used in stage 2 and 3
 typedef struct {
   double dx, dy, power;
   double lx, ly, lo;
@@ -73,15 +73,15 @@ double calc_pow_i(double power);
 double calc_spl_i(double powi, double ri);
 double calc_prms(double x, double y);
 double calc_spl_total(double data[], int src_count);
-int stage_3_table_content(double spl_total);
 int calc_intersections_quantity(double gridlength);
 sound_data_t *read_data(sound_data_t data[], int *src_count);
 void calc_stage1_loudness(sound_data_t data[], int src_count);
 void stage_1_result(sound_data_t data[], int src_count);
 void stage_2_result(sound_data_t data[], int src_count);
+int stage_3_table_content(int spl_total);
 void stage_3_result(sound_data_t data[], int src_count);
 
-// calculation functions
+// calculation functions, according to formula provided in handout
 double calc_pow_i(double power) { return 10 * log10(power / W0); }
 
 double calc_spl_i(double powi, double ri) {
@@ -103,28 +103,6 @@ double calc_spl_total(double data[], int src_count) {
 // calculate the number of points of intersetion with grids in the field
 int calc_intersections_quantity(double gridlength) {
   return (int)(WIDTH / gridlength + 1) * (HEIGHT / gridlength + 1);
-}
-
-int stage_3_table_content(double spl_total) {
-  if (20 < spl_total && spl_total < 25) {
-    return 2;
-  } else if (30 < spl_total && spl_total < 35) {
-    return 3;
-  } else if (40 < spl_total && spl_total < 45) {
-    return 4;
-  } else if (50 < spl_total && spl_total < 55) {
-    return 5;
-  } else if (60 < spl_total && spl_total < 65) {
-    return 6;
-  } else if (70 < spl_total && spl_total < 75) {
-    return 7;
-  } else if (80 < spl_total && spl_total < 85) {
-    return 8;
-  } else if (90 <= spl_total) {
-    return 9;
-  } else {
-    return 0;
-  }
 }
 
 // read data from file, store each into corresponding attribute
@@ -151,8 +129,8 @@ sound_data_t *read_data(sound_data_t data[], int *src_count) {
 // stage 1
 void calc_stage1_loudness(sound_data_t data[], int src_count) {
   for (int i = 0; i < src_count; i++) {
-    data[i].lo =
-        calc_spl_i(calc_pow_i(data[i].power), calc_prms(data[i].dx, data[i].dy));
+    data[i].lo = calc_spl_i(calc_pow_i(data[i].power),
+                            calc_prms(data[i].dx, data[i].dy));
   }
 }
 
@@ -165,37 +143,75 @@ void stage_1_result(sound_data_t data[], int src_count) {
   }
 }
 
+// stage 2
 void stage_2_result(sound_data_t data[], int src_count) {
-  // gridLength = 0.25, 0.5, 1.0
-  // TODO: starting from 0.25 and determine on the left or right, reduce
-  // calculation, current one is pure bruth force
+  // as handout required, gridlength is 1m, 0.5m, 0.25m
   for (double gridLength = 1.0; gridLength >= 0.25; gridLength /= 2) {
-    int dangerCount = 0;
-    for (double y = HEIGHT ; y >= 0; y -= gridLength) {
-      for (double x = 0; x <= WIDTH ; x += gridLength) {
+    int dangerCount = 0; // while gridLength changes, dangerCount should reset
+    // imagine the field as a cordination system, x-axis is East, y-axis is
+    // North start all calculation from the origin, which is (0,0)
+    for (double y = 0; y <= HEIGHT; y += gridLength) {
+      for (double x = 0; x <= WIDTH; x += gridLength) {
         double spl_at_each_point[src_count];
-        // This for loop calculate the SPL at certain cordinates in the
-        // field from the sound sources and store them in an array in
-        // order to calculate the total SPL at that point
+        /* This for loop calculate the SPL at certain cordinates in the
+        field from the sound sources and store them in an array in
+        order to calculate the total SPL at that point after*/
         for (int i = 0; i < src_count; i++) {
           double dist = calc_prms(x - data[i].dx, y - data[i].dy);
           double spli = calc_spl_i(calc_pow_i(data[i].power), dist);
           spl_at_each_point[i] = spli;
         }
+        // calculate the total SPL at that point and check if it's dangerous
         double spl_total = calc_spl_total(spl_at_each_point, src_count);
         if (spl_total >= DANGER_LEVEL) {
           dangerCount++;
         }
       }
     }
+
+    // print out the result
     printf("S2, grid = %4.2lfm, danger points = %6d / %6d = %4.2lf%%\n",
            gridLength, dangerCount, calc_intersections_quantity(gridLength),
            (dangerCount * 100.0) / calc_intersections_quantity(gridLength));
   }
 }
 
+// stage 3
+
+// there's no rounding for spl_total, only check the integer part thus using
+// double to take parameter is unnecessary, conditions are based on the handout
+int stage_3_table_content(int spl_total) {
+  if (spl_total >= 90) {
+    return 9;
+  }
+  switch (spl_total) {
+  case 20 ... 24:
+    return 2;
+  case 30 ... 34:
+    return 3;
+  case 40 ... 44:
+    return 4;
+  case 50 ... 54:
+    return 5;
+  case 60 ... 64:
+    return 6;
+  case 70 ... 74:
+    return 7;
+  case 80 ... 84:
+    return 8;
+  default:
+    return 0;
+  }
+}
+
 void stage_3_result(sound_data_t data[], int src_count) {
-  for (double y = 99.0; (y < HEIGHT && 0 < y); y -= 2) {
+  // according my knowledgebae,there's no way to output a table from bottom to
+  // top in CLI, so start from top to bottom, unlike stage2, have to start from
+  // top left corner
+  for (double y = 99.0; (y < HEIGHT && 0 < y);
+       y -= 2) { // values provided by handout
+    // same idea as stage2, calculate SPL at each point and store them in an
+    // array and check final result
     double spl_at_each_point[src_count];
     for (double x = 0.5; x < WIDTH; x++) {
       for (int i = 0; i < src_count; i++) {
@@ -206,6 +222,7 @@ void stage_3_result(sound_data_t data[], int src_count) {
       double spl_total = calc_spl_total(spl_at_each_point, src_count);
       int result = stage_3_table_content(spl_total);
 
+      // print out the result table
       if (x == 0.5) { // Beginning of each row
         if (result != 0) {
           printf("S3, %d", result);
@@ -219,7 +236,7 @@ void stage_3_result(sound_data_t data[], int src_count) {
           } else {
             printf(" \n");
           }
-        } else {
+        } else { // Middle content of each row
           if (result != 0) {
             printf("%d", result);
           } else {
@@ -239,10 +256,13 @@ int main(int argc, char *argv[]) {
   sound_data_t *data = read_data(source, &src_count);
 
   calc_stage1_loudness(data, src_count);
+
   stage_1_result(data, src_count);
   printf("\n");
+
   stage_2_result(data, src_count);
   printf("\n");
+
   stage_3_result(data, src_count);
 
   return 0;
