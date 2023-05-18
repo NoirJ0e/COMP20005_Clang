@@ -209,6 +209,7 @@ int stage_3_table_content(double spl_total) {
     }
 }
 
+
 void stage_3_result(sound_data_t data[], int src_count) {
     // according my knowledgebae,there's no way to output a table from bottom to
     // top in CLI, so start from top to bottom, unlike stage2, have to start
@@ -218,6 +219,7 @@ void stage_3_result(sound_data_t data[], int src_count) {
         // same idea as stage2, calculate SPL at each point and store them in an
         // array and check final result
         double spl_at_each_point[src_count];
+        printf("S3, ");
         for (double x = 0.5; x < WIDTH; x++) {
             for (int i = 0; i < src_count; i++) {
                 double dist = calc_prms(x - data[i].dx, y - data[i].dy);
@@ -228,28 +230,13 @@ void stage_3_result(sound_data_t data[], int src_count) {
             int result = stage_3_table_content(spl_total);
 
             // print out the result table
-            if (x == 0.5) {  // Beginning of each row
-                if (result != 0) {
-                    printf("S3, %d", result);
-                } else {
-                    printf("S3,  ");
-                }
+            if (result != 0) {
+              printf("%d", result);
             } else {
-                if (x == 73.5) {  // End of each row
-                    if (result != 0) {
-                        printf("%d\n", result);
-                    } else {
-                        printf(" \n");
-                    }
-                } else {  // Middle content of each row
-                    if (result != 0) {
-                        printf("%d", result);
-                    } else {
-                        printf(" ");
-                    }
-                }
+              printf(" ");
             }
         }
+        printf("\n");
     }
     // dont forget the ta daa!
     printf("\nta daa!\n");
@@ -271,18 +258,4 @@ int main(int argc, char *argv[]) {
     stage_3_result(data, src_count);
 
     return 0;
-}
-
-void test(sound_data_t data[], int src_count, double gridLength) {
-    // update x-axis
-    for (int x = 0; x < WIDTH; x++) {
-        // create temp array for SPL_i from each source
-        double temp_arr_for_spl_total[src_count];
-        for (int y = 0; y < HEIGHT; y++) {
-            // calculate spl_i from each point
-            double spl_i_from_each_point =
-                calc_spl_i(calc_pow_i(data[i].power),
-                           calc_prms(x - data[i].dx, y - data[i].dy));
-        }
-    }
 }
