@@ -62,10 +62,8 @@
 
 // dx = distance to East, dy = distance to North, power = power of sound source
 // lx = loudness at x, ly = loudness at y, lo = loudness at origin
-// lo used in stage 1 only, lx and ly are used in stage 2 and 3
 typedef struct {
-    double dx, dy, power;
-    double lx, ly, lo;
+    double dx, dy, power,lo;
 } sound_data_t;
 
 // function prototypes
@@ -183,9 +181,20 @@ void stage_2_result(sound_data_t data[], int src_count) {
 
 // stage 3
 
+int stage_3_table_content(double spl_total) {
+  if (spl_total >= 90) {
+    return 9;
+  } else if (spl_total < 20) {
+    return 0;
+  } else if (((int)spl_total % 10) >= 5) {
+    return 0;
+  }
+  return (int)(spl_total / 10);
+}
+
 // there's no rounding for spl_total, only check the integer part thus using
 // double to take parameter is unnecessary, conditions are based on the handout
-int stage_3_table_content(double spl_total) {
+/* int stage_3_table_content(double spl_total) {
     if (spl_total >= 90) {
         return 9;
     }
@@ -207,7 +216,7 @@ int stage_3_table_content(double spl_total) {
         default:
             return 0;
     }
-}
+} */
 
 
 void stage_3_result(sound_data_t data[], int src_count) {
